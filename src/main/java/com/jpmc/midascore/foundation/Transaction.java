@@ -17,7 +17,7 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public long getSenderId() {
+    public Long getSenderId() {
         return senderId;
     }
 
@@ -25,7 +25,7 @@ public class Transaction {
         this.senderId = senderId;
     }
 
-    public long getRecipientId() {
+    public Long getRecipientId() {
         return recipientId;
     }
 
