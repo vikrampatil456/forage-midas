@@ -3,6 +3,7 @@ package com.jpmc.midascore.service;
 import com.jpmc.midascore.entity.TransactionRecord;
 import com.jpmc.midascore.entity.UserRecord;
 import com.jpmc.midascore.foundation.Transaction;
+import com.jpmc.midascore.model.Incentive;
 import com.jpmc.midascore.repository.TransactionRecordRepository;
 import com.jpmc.midascore.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,12 @@ public class TransactionService {
 
     private final UserRepository userRepository;
     private final TransactionRecordRepository transactionRepo;
+    private final IncentiveClient incentiveClient;
 
-    public TransactionService(UserRepository userRepository, TransactionRecordRepository transactionRepo) {
+    public TransactionService(UserRepository userRepository, TransactionRecordRepository transactionRepo, IncentiveClient incentiveClient) {
         this.userRepository = userRepository;
         this.transactionRepo = transactionRepo;
+        this.incentiveClient = incentiveClient;
     }
 
     @Transactional
@@ -40,6 +43,12 @@ public class TransactionService {
             return;
         }
 
+        Incentive incentive = incentiveClient.fetchIncentive(tx);
+        double incentiveAmount = incentive.getAmount();
+
+        tx.setIncentive(incentiveAmount);
+
+
         // update balance
         sender.setBalance(sender.getBalance() - tx.getAmount());
         recipient.setBalance(recipient.getBalance() + tx.getAmount());
@@ -52,11 +61,8 @@ public class TransactionService {
         userRepository.save(sender);
         userRepository.save(recipient);
 
-        System.out.println("Processing transaction:" + tx.getAmount());
-
-        if (sender.getName().equals("waldorf")) {
-            System.out.println("WALDORF BALANCE = " + sender.getBalance());
-        }
-
+//        if (sender.getName().equals("waldorf")) {
+//            System.out.println("WALDORF BALANCE = " + sender.getBalance());
+//       }
     }
 }
