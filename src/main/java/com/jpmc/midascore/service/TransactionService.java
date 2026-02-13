@@ -25,7 +25,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public void  process(Transaction tx) {
+    public void process(Transaction tx) {
 
         Optional<UserRecord> senderOpt =
                 userRepository.findById(tx.getSenderId());
@@ -48,10 +48,9 @@ public class TransactionService {
 
         tx.setIncentive(incentiveAmount);
 
-
-        // update balance
+        // update balances
         sender.setBalance(sender.getBalance() - tx.getAmount());
-        recipient.setBalance(recipient.getBalance() + tx.getAmount());
+        recipient.setBalance((float) (recipient.getBalance() + tx.getAmount() + incentiveAmount));
 
         // persist transaction
         TransactionRecord record =
@@ -60,9 +59,6 @@ public class TransactionService {
         transactionRepo.save(record);
         userRepository.save(sender);
         userRepository.save(recipient);
-
-//        if (sender.getName().equals("waldorf")) {
-//            System.out.println("WALDORF BALANCE = " + sender.getBalance());
-//       }
     }
+
 }
